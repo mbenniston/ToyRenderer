@@ -95,6 +95,11 @@ void vec3_print(const vec3 vec) {
 
 ////////////////////////////////////////////////////////
 
+
+void vec4_cpy(const vec4 vec, vec4 out) {
+    memcpy(out, vec, 4 * sizeof(float));
+}
+
 void vec4_add(const vec4 left, const vec4 right, vec4 out) {
     out[0] = left[0] + right[0];
     out[1] = left[1] + right[1];
@@ -117,13 +122,16 @@ void vec4_mul(const vec4 left, const vec4 right, vec4 out) {
 }
 
 void vec4_mul_mat4(const vec4 left, const mat4 right, vec4 out) {
-    memset(out, 0, 4 * sizeof(float));
+    vec4 temp;
+    memset(temp, 0, 4 * sizeof(float));
 
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 4; j++) {
-            out[i] += left[j]* right[i][j];
+            temp[i] += left[j]* right[i][j];
         }
     }
+
+    vec4_cpy(temp, out);
 }
 
 void vec4_div(const vec4 left, const vec4 right, vec4 out) {
@@ -153,8 +161,8 @@ void mat4_setPerspective(mat4 mat, float fov, float aspect, float nearPlane, flo
     mat[0][0] = tanfov / aspect;
     mat[1][1] = tanfov;
     mat[2][2] = farPlane / (farPlane - nearPlane);
-    mat[3][2] = (-farPlane *nearPlane) / (farPlane - nearPlane);
-    mat[2][3] = 1.0f;
+    mat[2][3] = (-farPlane * nearPlane) / (farPlane - nearPlane);
+    mat[3][2] = 1.0f;
 }
 
 void vec4_print(const vec4 vec) {
@@ -385,7 +393,6 @@ void mat4_setRotZ(float rz, mat4 mat) {
     mat[0][1] = -sinTheta;
     mat[1][0] = sinTheta;
     mat[1][1] = cosTheta; 
-    //mat[2][2] = 0.0f; ???
 }
 
 void mat4_setRotXYZ(float rx, float ry, float rz, mat4 mat) {

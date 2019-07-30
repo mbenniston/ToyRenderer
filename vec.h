@@ -41,6 +41,7 @@ void vec3_print(const vec3 vec);
 
 ///////////////////////////////////////////////////////////
 
+void vec4_cpy(const vec4 vec, vec4 out);
 void vec4_add(const vec4 left, const vec4 right, vec4 out);
 void vec4_sub(const vec4 left, const vec4 right, vec4 out); 
 void vec4_mul(const vec4 left, const vec4 right, vec4 out); 
