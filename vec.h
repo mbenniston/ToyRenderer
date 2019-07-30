@@ -22,7 +22,7 @@ void vec2_sub(const vec2 left, const vec2 right, vec2 out);
 void vec2_mul(const vec2 left, const vec2 right, vec2 out);
 void vec2_div(const vec2 left, const vec2 right, vec2 out);
 float vec2_dot(const vec2 left, const vec2 right);
-float vec2_legnthSqaured(const vec2 vec);
+float vec2_lengthSquared(const vec2 vec);
 float vec2_length(const vec2 vec);
 
 ///////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ void vec3_sub(const vec3 left, const vec3 right, vec3 out);
 void vec3_mul(const vec3 left, const vec3 right, vec3 out);
 void vec3_div(const vec3 left, const vec3 right, vec3 out);
 float vec3_dot(const vec3 left, const vec3 right);
-float vec3_legnthSqaured(const vec3 vec);
+float vec3_lengthSquared(const vec3 vec);
 float vec3_length(const vec3 vec);
 void vec3_neg(const vec3 vec, vec3 out);
 void vec3_normalize(const vec3 vec, vec3 out);
@@ -47,7 +47,7 @@ void vec4_mul(const vec4 left, const vec4 right, vec4 out);
 void vec4_mul_mat4(const vec4 left, const mat4 right, vec4 out); 
 void vec4_div(const vec4 left, const vec4 right, vec4 out); 
 float vec4_dot(const vec4 left, const vec4 right);
-float vec4_legnthSqaured(const vec4 vec);
+float vec4_lengthSquared(const vec4 vec);
 float vec4_length(const vec4 vec);
 void vec4_print(const vec4 vec);
 

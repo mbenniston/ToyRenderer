@@ -26,12 +26,12 @@ float vec2_dot(const vec2 left, const vec2 right) {
     return left[0] * right[0] + left[1] * left[1];
 }
 
-float vec2_legnthSqaured(const vec2 vec){
+float vec2_lengthSquared(const vec2 vec){
     return vec2_dot(vec, vec);
 }
 
 float vec2_length(const vec2 vec) {
-    return sqrtf(vec2_legnthSqaured(vec));
+    return sqrtf(vec2_lengthSquared(vec));
 }
 
 ////////////////////////////////////////////////////////
@@ -68,12 +68,12 @@ float vec3_dot(const vec3 left, const vec3 right) {
     return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
 }
 
-float vec3_legnthSqaured(const vec3 vec){
+float vec3_lengthSquared(const vec3 vec){
     return vec3_dot(vec, vec);
 }
 
 float vec3_length(const vec3 vec) {
-    return sqrtf(vec3_legnthSqaured(vec));
+    return sqrtf(vec3_lengthSquared(vec));
 } 
 
 void vec3_neg(const vec3 vec, vec3 out) {
@@ -137,12 +137,12 @@ float vec4_dot(const vec4 left, const vec4 right) {
     return left[0] * right[0] + left[1] * right[1] + left[2] * right[2] + left[3] * right[3];
 }
 
-float vec4_legnthSqaured(const vec4 vec){
+float vec4_lengthSquared(const vec4 vec){
     return vec4_dot(vec, vec);
 }
 
 float vec4_length(const vec4 vec) {
-    return sqrtf(vec4_legnthSqaured(vec));
+    return sqrtf(vec4_lengthSquared(vec));
 } 
 
 void mat4_setPerspective(mat4 mat, float fov, float aspect, float nearPlane, float farPlane) {

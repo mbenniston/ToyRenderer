@@ -95,7 +95,7 @@ int main()
 		mat4_setIdentity(rotMat);
 		static float t = 0;
 		t += timeTake * 0.5f * PI;
-		mat4_setRotXYZ(t * 0.5f, t, 0, rotMat);
+		mat4_setRotXYZ(t * 0.75f, t, 0, rotMat);
 
 		mat4 transMat;
 		mat4_setIdentity(transMat);
