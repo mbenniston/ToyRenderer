@@ -7,7 +7,11 @@ typedef float vec2[2];
 typedef float vec3[3];
 typedef float vec4[4];
 typedef float mat4[4][4];
-typedef vec3 tri3[3];
+
+struct triangle {
+    vec3 vertices[3];
+    vec3 normals[3];
+};
 
 #define PI 3.1415926535
 
@@ -23,6 +27,7 @@ float vec2_length(const vec2 vec);
 
 ///////////////////////////////////////////////////////////
 
+void vec3_cpy(const vec3 vec, vec3 out);
 void vec3_add(const vec3 left, const vec3 right, vec3 out);
 void vec3_sub(const vec3 left, const vec3 right, vec3 out);
 void vec3_mul(const vec3 left, const vec3 right, vec3 out);
@@ -30,6 +35,9 @@ void vec3_div(const vec3 left, const vec3 right, vec3 out);
 float vec3_dot(const vec3 left, const vec3 right);
 float vec3_legnthSqaured(const vec3 vec);
 float vec3_length(const vec3 vec);
+void vec3_neg(const vec3 vec, vec3 out);
+void vec3_normalize(const vec3 vec, vec3 out);
+void vec3_print(const vec3 vec);
 
 ///////////////////////////////////////////////////////////
 
@@ -45,6 +53,7 @@ void vec4_print(const vec4 vec);
 
 ///////////////////////////////////////////////////////////
 
+void mat4_cpy(const mat4 mat, mat4 out);
 void mat4_setIdentity(mat4 mat);
 void mat4_setZero(mat4 mat);
 void mat4_mul(const mat4 left, const mat4 right, mat4 out);
@@ -52,6 +61,12 @@ void mat4_setTranslation(mat4 mat, float x, float y, float z);
 void mat4_setScale(mat4 mat, float sx, float sy, float sz);
 void mat4_setOrtho(mat4 mat, float left, float right, float top, float bottom);
 void mat4_setPerspective(mat4 mat, float fov, float aspect, float nearPlane, float farPlane); //fov in degrees
+void mat4_setRotX(float rx, mat4 mat);
+void mat4_setRotY(float ry, mat4 mat);
+void mat4_setRotZ(float rz, mat4 mat);
+void mat4_setRotXYZ(float rx, float ry, float rz, mat4 mat);
+void mat4_inverse(const mat4 mat, mat4 invOut);
+void mat4_transpose(const mat4 mat, mat4 transOut);
 void mat4_print(const mat4 mat);
 
 #endif
