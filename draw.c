@@ -85,18 +85,20 @@ void drawTriangleDepthTested(struct FrameBuffer framebuffer, struct DepthBuffer 
 				w1 /= area; 
 				w2 /= area; 
 				
+				int invJ = framebuffer.height - j;
 				float oneOverZ = tri.vertices[0][2] * w0 + tri.vertices[1][2] * w1 + tri.vertices[2][2] * w2;
 
 				float depthOfPixel = oneOverZ;
-				if(depthOfPixel > 1 || depthOfPixel >= depthbuffer.depth[j * depthbuffer.width + i]) continue;
+				if(depthOfPixel <= 1 && depthOfPixel < depthbuffer.depth[invJ * depthbuffer.width + i]) {
 
-				//framebuffer in bgr format
-				framebuffer.pixels[4*(j * framebuffer.width + i) + 0] = (unsigned char)(color[2] * 255); 
-				framebuffer.pixels[4*(j * framebuffer.width + i) + 1] = (unsigned char)(color[1] * 255); 
-				framebuffer.pixels[4*(j * framebuffer.width + i) + 2] = (unsigned char)(color[0] * 255); 
-				framebuffer.pixels[4*(j * framebuffer.width + i) + 3] = (unsigned char)(1 * 255); 
+					//framebuffer in bgr format
+					framebuffer.pixels[4*(invJ * framebuffer.width + i) + 0] = (unsigned char)(color[2] * 255); 
+					framebuffer.pixels[4*(invJ * framebuffer.width + i) + 1] = (unsigned char)(color[1] * 255); 
+					framebuffer.pixels[4*(invJ * framebuffer.width + i) + 2] = (unsigned char)(color[0] * 255); 
+					framebuffer.pixels[4*(invJ * framebuffer.width + i) + 3] = (unsigned char)(1 * 255); 
 
-				depthbuffer.depth[(j * depthbuffer.width + i)] = depthOfPixel;
+					depthbuffer.depth[(invJ * depthbuffer.width + i)] = depthOfPixel;
+				}
 			} 
 		} 
 	}
@@ -104,11 +106,14 @@ void drawTriangleDepthTested(struct FrameBuffer framebuffer, struct DepthBuffer 
 
 void drawModel(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, const struct model m, const mat4 projMat, const mat4 viewMat, const mat4 modelMat, const vec3 camPos)
 {
+	//calc normal matrix, transpose(inverse(viewMatrx)) * transpose(inverse(modelMatrix))
 	mat4 normalMat;
-	mat4_cpy(modelMat, normalMat);
-	mat4 temp;
-	mat4_inverse(normalMat, temp);
-	mat4_transpose(temp, normalMat);
+	mat4 temp, temp2, temp3;
+	mat4_inverse(modelMat, temp);
+	mat4_transpose(temp, temp3);
+	mat4_inverse(viewMat, temp);
+	mat4_transpose(temp, temp2);
+	mat4_mul(temp3, temp2, normalMat);
 
 	for(int i = 0; i < m.numTriangles; i++){
 		//project triangle
@@ -147,6 +152,7 @@ void drawModel(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, c
 			vec4 normal = {m.triangles[i].normals[v][0],m.triangles[i].normals[v][1],m.triangles[i].normals[v][2],1};
 			vec4 newNormal;
 			vec4_mul_mat4(normal, normalMat, newNormal);
+			vec4_normalize(newNormal, newNormal);
 			vec3_cpy(newNormal, projectedTri.normals[v]);  
 
 			//backface cull
@@ -159,11 +165,21 @@ void drawModel(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, c
 
 		if(offScreenCnt == 3) continue;
 
-		vec3 lightDir = {-0.7, -0.5, 1};
+		vec4 lightDir = {-0.7, 0.5, 1, 1};
 		vec3_neg(lightDir, lightDir);
 		vec3_normalize(lightDir, lightDir);
+		
+		vec4_mul_mat4(lightDir, temp2, lightDir);
+		vec3_normalize(lightDir, lightDir);
 
-		float ndotl = fmax(0.05f, vec3_dot(projectedTri.normals[1], lightDir));
+		vec3 normalM = {0,0,0}, diver = {1.0f / 3, 1.0f / 3, 1.0f / 3};
+		vec3_add(normalM, projectedTri.normals[0], normalM);
+		vec3_add(normalM, projectedTri.normals[1], normalM);
+		vec3_add(normalM, projectedTri.normals[2], normalM);
+		vec3_div(normalM, diver, normalM);
+		vec3_normalize(normalM, normalM);
+
+		float ndotl = fmax(0.05f, vec3_dot(normalM, lightDir));
 		RGB col = {ndotl,0  * ndotl,0.5 * ndotl};
 
 		drawTriangleDepthTested(framebuffer, depthbuffer, projectedTri, col);

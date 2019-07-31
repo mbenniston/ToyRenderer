@@ -13,7 +13,9 @@
 extern int debug_RenderedTris;
 
 vec3 camPos;
+float camRot;
 
+int rotSpeed = 0;
 int forward = 0;
 int strafe = 0;
 
@@ -48,14 +50,29 @@ void keyboard_cb(struct Window *window, Key key, KeyMod mod, bool isPressed)
 				forward = 0;
 			}	
 			break;
+		case KB_KEY_LEFT: 
+			if(isPressed) { 
+				rotSpeed = 1;
+			} else {
+				rotSpeed = 0;
+			}	
+			break;
+		case KB_KEY_RIGHT: 
+			if(isPressed) { 
+				rotSpeed = -1;
+			} else {
+				rotSpeed = 0;
+			}	
+			break;
 	}
 }
 
 int main()
 {
-	struct model mod, mod2;
+	struct model mod, mod2, floor;
 	model_Load("sphere.obj", &mod);
 	model_Load("cube.obj", &mod2);
+	model_Load("floor.obj", &floor);
 
 	struct FrameBuffer framebuffer;
 	framebuffer.width = FB_WIDTH;
@@ -85,6 +102,8 @@ int main()
 	camPos[1] = 0;
 	camPos[2] = 0;
 
+	camRot = 0;
+
 	clock_t start;
 	clock_t end;
 	double timeTaken = 0, fpsTimer = 0;
@@ -95,11 +114,17 @@ int main()
 
 		//clear 
 		RGBA clearCol = {0.1,0.1,0.23, 1};
+		clearFrameBuffer(framebuffer, clearCol);
 		clearFrameBuffer(framebuffer_LowRes, clearCol);
 		clearDepthBuffer(depthbuffer);
 
-		camPos[2] += 10 * forward * timeTaken;
-		camPos[0] += 10 * strafe * timeTaken;
+		camPos[0] += -sin(camRot) * 10 * forward * timeTaken;
+		camPos[2] += cos(camRot) * 10 * forward * timeTaken;
+
+		camPos[0] += cos(camRot) * 10 *  strafe * timeTaken;
+		camPos[2] += sin(camRot) * 10 *  strafe * timeTaken;
+
+		camRot += 0.5f * rotSpeed * timeTaken;
 
 		mat4 projMat;
 		mat4_setPerspective(projMat, CAM_FOV, FB_ASPECT, CAM_NEAR, CAM_FAR);
@@ -122,13 +147,20 @@ int main()
 		mat4 viewMat;
 		mat4_setIdentity(viewMat);
 		mat4_setTranslation(viewMat, -camPos[0], -camPos[1], -camPos[2]);
+		mat4_rotate(viewMat, 0, camRot, 0, viewMat);
 
 		debug_RenderedTris = 0;
 
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 8; i++) {
 			mat4_setTranslation(modelMat, 3 * i, 0, 5);
 			drawModel(framebuffer_LowRes, depthbuffer, i % 2 == 0 ? mod : mod2, projMat, viewMat, modelMat, camPos);
 		}
+
+		// mat4_setIdentity(modelMat);
+		// mat4_setScale(modelMat, 10, 1, 10);
+		// mat4_setTranslation(modelMat, 0, -5, 5);
+		// drawModel(framebuffer_LowRes, depthbuffer, floor, projMat, viewMat, modelMat, camPos);
+
 		//upscale
 		blitFrameBuffer(framebuffer_LowRes, framebuffer);
 
@@ -140,9 +172,6 @@ int main()
 		end = clock();
 		clock_t diff = end - start;
 		timeTaken = (double)diff / CLOCKS_PER_SEC;
-		// if(timeTaken < 1.0f / 30.0f) {
-		// 	usleep((1.0f / 30.0f - timeTaken) * powf(10, 6));
-		// }
 
 		numFrames++;
 		fpsTimer += timeTaken;

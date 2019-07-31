@@ -169,6 +169,15 @@ void vec4_print(const vec4 vec) {
     printf("%f, %f, %f, %f\n\n", vec[0], vec[1], vec[2], vec[3]);
 }
 
+void vec4_normalize(const vec4 vec, vec4 out)
+{
+    float l = vec4_length(vec);
+    out[0] = vec[0] / l;
+    out[1] = vec[1] / l;
+    out[2] = vec[2] / l;
+    out[3] = vec[3] / l;
+}
+
 ////////////////////////////////////////////////////////
 
 void mat4_setIdentity(mat4 mat) {
@@ -406,3 +415,12 @@ void mat4_setRotXYZ(float rx, float ry, float rz, mat4 mat) {
     // mat4 mzyx;
     mat4_mul(mzy, mx, mat);
 }
+
+void mat4_rotate(const mat4 inMat, float rx, float ry, float rz, mat4 outMat)
+{
+    mat4 rotMat, tempOut;
+    mat4_setRotXYZ(rx,ry,rz, rotMat);
+    mat4_mul(inMat, rotMat, tempOut);
+    mat4_cpy(tempOut, outMat);
+}
+

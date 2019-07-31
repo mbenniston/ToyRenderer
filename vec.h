@@ -52,6 +52,8 @@ float vec4_lengthSquared(const vec4 vec);
 float vec4_length(const vec4 vec);
 void vec4_print(const vec4 vec);
 
+void vec4_normalize(const vec4 vec, vec4 out);
+
 ///////////////////////////////////////////////////////////
 
 void mat4_cpy(const mat4 mat, mat4 out);
@@ -69,5 +71,7 @@ void mat4_setRotXYZ(float rx, float ry, float rz, mat4 mat);
 void mat4_inverse(const mat4 mat, mat4 invOut);
 void mat4_transpose(const mat4 mat, mat4 transOut);
 void mat4_print(const mat4 mat);
+
+void mat4_rotate(const mat4 inMat, float rx, float ry, float rz, mat4 outMat);
 
 #endif
