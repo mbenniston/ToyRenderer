@@ -7,6 +7,7 @@
 #include <math.h>
 #include <unistd.h>
 
+#include "util.h"
 #include "draw.h"
 #include "model.h"
 
@@ -151,20 +152,16 @@ int main()
 
 		debug_RenderedTris = 0;
 
-		for(int i = 0; i < 8; i++) {
-			mat4_setTranslation(modelMat, 3 * i, 0, 5);
-			drawModel(framebuffer_LowRes, depthbuffer, i % 2 == 0 ? mod : mod2, projMat, viewMat, modelMat, camPos);
+		for(int i = 0; i < 100; i++) {
+			mat4_setTranslation(modelMat, 3 * (i % 10), 0, 5 + 3 * (i / 10));
+			
+			drawModel(framebuffer_LowRes, depthbuffer, mod, projMat, viewMat, modelMat, camPos);
 		}
 
-		// mat4_setIdentity(modelMat);
-		// mat4_setScale(modelMat, 10, 1, 10);
-		// mat4_setTranslation(modelMat, 0, -5, 5);
-		// drawModel(framebuffer_LowRes, depthbuffer, floor, projMat, viewMat, modelMat, camPos);
-
 		//upscale
-		blitFrameBuffer(framebuffer_LowRes, framebuffer);
+		// blitFrameBuffer(framebuffer_LowRes, framebuffer);
 
-		int state = mfb_update(window, framebuffer.pixels);
+		int state = mfb_update(window, framebuffer_LowRes.pixels);
 
 		if (state < 0)
 			break;
