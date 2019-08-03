@@ -2,13 +2,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "util.h"
 
 #define INITIAL_TRIANGLES 1024
-#define TRIANGLE_SIZE (3 * 3 * sizeof(float))
 
 struct face {
     unsigned int v0, v1, v2; //indicies
@@ -44,15 +44,16 @@ void model_Load(const char* filePath, struct model* const m)
             if(strncmp(line, "v ", 2) == 0) {
                 //handle vertex
                 vec3 vertex;
-                sscanf(line, "v %f %f %f\n", &vertex[0], &vertex[1], &vertex[2]);    
+                int ret = sscanf(line, "v %f %f %f\n", &vertex[0], &vertex[1], &vertex[2]);    
+                assert(ret == 3);
                 array_list_Push(&verticesBuffer, vertex);
 
             } else if(strncmp(line, "vn ", 3) == 0) {
                 //handle normal
                 vec3 normal;
-                sscanf(line, "vn %f %f %f\n", &normal[0], &normal[1], &normal[2]);    
+                int ret = sscanf(line, "vn %f %f %f\n", &normal[0], &normal[1], &normal[2]);    
+                assert(ret == 3);
                 array_list_Push(&normalsBuffer, normal);
-                //check if buffer is exceeded
 
             }else if(strncmp(line, "f ", 2) == 0) {
                 //handle face
@@ -62,7 +63,7 @@ void model_Load(const char* filePath, struct model* const m)
                     &face.v1, &face.t1, &face.n1, 
                     &face.v2, &face.t2, &face.n2 
                 );    
-                if(ret != 9) exit(1); 
+                assert(ret == 9);
 
                 array_list_Push(&facesBuffer, &face);
                 
@@ -72,7 +73,7 @@ void model_Load(const char* filePath, struct model* const m)
     }
 
     //Allocate memory for triangles
-    m->triangles = malloc(INITIAL_TRIANGLES * TRIANGLE_SIZE);
+    m->triangles = malloc(facesBuffer.currentItem * 3 * sizeof(struct triangle));
     m->numTriangles = 0;
 
     //compile faces
@@ -96,7 +97,7 @@ void model_Load(const char* filePath, struct model* const m)
     array_list_Free(&normalsBuffer);
     fclose(file);
 
-    printf("Loaded %i triangles\n", m->numTriangles);
+    printf("Loaded %li triangles\n", m->numTriangles);
 }
 
 void model_Free(struct model* m) 

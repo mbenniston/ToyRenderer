@@ -6,6 +6,7 @@
 typedef float vec2[2];
 typedef float vec3[3];
 typedef float vec4[4];
+
 typedef float mat4[4][4];
 
 struct triangle {
@@ -73,5 +74,6 @@ void mat4_transpose(const mat4 mat, mat4 transOut);
 void mat4_print(const mat4 mat);
 
 void mat4_rotate(const mat4 inMat, float rx, float ry, float rz, mat4 outMat);
+void mat4_translate(const mat4 inMat, float x, float y, float z, mat4 outMat);
 
 #endif

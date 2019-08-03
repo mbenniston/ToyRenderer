@@ -424,3 +424,11 @@ void mat4_rotate(const mat4 inMat, float rx, float ry, float rz, mat4 outMat)
     mat4_cpy(tempOut, outMat);
 }
 
+void mat4_translate(const mat4 inMat, float x, float y, float z, mat4 outMat)
+{
+    mat4 transMat, tempOut;
+    mat4_setIdentity(transMat);
+    mat4_setTranslation(transMat, x, y, z);
+    mat4_mul(inMat, transMat, tempOut);
+    mat4_cpy(tempOut, outMat);
+}

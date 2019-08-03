@@ -4,10 +4,10 @@
 #include "vec.h"
 #include "model.h"
 
-void clearFrameBuffer(struct FrameBuffer framebuffer, const RGBA clearColor);
-void clearDepthBuffer(struct DepthBuffer buffer);
-void blitFrameBuffer(const struct FrameBuffer read_buf, struct FrameBuffer write_buf);
-void drawTriangle(struct FrameBuffer framebuffer, const struct triangle tri, const RGB color);
-void drawModel(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, const struct model m, const mat4 projMat, const mat4 viewMat, const mat4 modelMat, const vec3 camPos);
+void clearframebuffer(struct framebuffer framebuffer, const rgba clearColor);
+void cleardepthbuffer(struct depthbuffer buffer);
+void blitframebuffer(const struct framebuffer read_buf, struct framebuffer write_buf);
+void drawTriangle(struct framebuffer framebuffer, const struct triangle tri, const rgb color);
+void drawModel(struct framebuffer framebuffer, struct depthbuffer depthbuffer, const struct model m, const mat4 projMat, const mat4 viewMat, const mat4 modelMat, const vec3 camPos);
 
 #endif

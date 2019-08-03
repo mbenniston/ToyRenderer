@@ -65,6 +65,8 @@ void keyboard_cb(struct Window *window, Key key, KeyMod mod, bool isPressed)
 				rotSpeed = 0;
 			}	
 			break;
+		default:
+			break;
 	}
 }
 
@@ -75,17 +77,17 @@ int main()
 	model_Load("cube.obj", &mod2);
 	model_Load("floor.obj", &floor);
 
-	struct FrameBuffer framebuffer;
+	struct framebuffer framebuffer;
 	framebuffer.width = FB_WIDTH;
 	framebuffer.height= FB_HEIGHT;
 	framebuffer.pixels = malloc(framebuffer.width * framebuffer.height * 4);
 	
-	struct FrameBuffer framebuffer_LowRes;
+	struct framebuffer framebuffer_LowRes;
 	framebuffer_LowRes.width = FB_WIDTH * RENDER_SCALE;
 	framebuffer_LowRes.height= FB_HEIGHT * RENDER_SCALE;
 	framebuffer_LowRes.pixels = malloc(framebuffer_LowRes.width * framebuffer_LowRes.height * 4);
 
-	struct DepthBuffer depthbuffer;
+	struct depthbuffer depthbuffer;
 	depthbuffer.width = framebuffer_LowRes.width;
 	depthbuffer.height = framebuffer_LowRes.height;
 	depthbuffer.depth = malloc(depthbuffer.width * depthbuffer.height * sizeof(float));
@@ -114,10 +116,10 @@ int main()
 		start = clock();
 
 		//clear 
-		RGBA clearCol = {0.1,0.1,0.23, 1};
-		clearFrameBuffer(framebuffer, clearCol);
-		clearFrameBuffer(framebuffer_LowRes, clearCol);
-		clearDepthBuffer(depthbuffer);
+		rgba clearCol = {0.1,0.1,0.23, 1};
+		clearframebuffer(framebuffer, clearCol);
+		clearframebuffer(framebuffer_LowRes, clearCol);
+		cleardepthbuffer(depthbuffer);
 
 		camPos[0] += -sin(camRot) * 10 * forward * timeTaken;
 		camPos[2] += cos(camRot) * 10 * forward * timeTaken;
@@ -159,9 +161,9 @@ int main()
 		}
 
 		//upscale
-		// blitFrameBuffer(framebuffer_LowRes, framebuffer);
+		blitframebuffer(framebuffer_LowRes, framebuffer);
 
-		int state = mfb_update(window, framebuffer_LowRes.pixels);
+		int state = mfb_update(window, framebuffer.pixels);
 
 		if (state < 0)
 			break;

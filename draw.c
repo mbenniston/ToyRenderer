@@ -1,8 +1,9 @@
 #include "draw.h"
+
+#include <stdlib.h>
+#include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
-#include <stdio.h>
-#include <pthread.h>
 #include <time.h>
 #include <math.h>
 
@@ -29,7 +30,7 @@ inline float edgeFunction(const vec3 a, const vec3 b, const vec3 c)
 int debug_RenderedTris;
 
 
-void clearFrameBuffer(struct FrameBuffer framebuffer, const RGBA clearColor)
+void clearframebuffer(struct framebuffer framebuffer, const rgba clearColor)
 {
     for (uint32_t j = 0; j < framebuffer.height; ++j) { 
 		for (uint32_t i = 0; i < framebuffer.width; ++i) { 
@@ -41,15 +42,15 @@ void clearFrameBuffer(struct FrameBuffer framebuffer, const RGBA clearColor)
 	}
 }
 
-void blitFrameBuffer(const struct FrameBuffer read_buf, struct FrameBuffer write_buf)
+void blitframebuffer(const struct framebuffer read_buf, struct framebuffer write_buf)
 {
 	for(int i = 0; i < write_buf.width; i++){
 		for(int j = 0; j < write_buf.height; j++){
 			float ndcX = (i + 0.5f) / write_buf.width;
 			float ndcY = (j + 0.5f) / write_buf.height;
 			
-			int projX = round(ndcX * read_buf.width);
-			int projY = round(ndcY * read_buf.height);
+			int projX = floor(ndcX * read_buf.width);
+			int projY = floor(ndcY * read_buf.height);
 			int readIndex = 4*(projX + projY * read_buf.width);
 			int Index = 4*(i + j * write_buf.width);
 			memcpy(&write_buf.pixels[Index], &read_buf.pixels[readIndex], 4);
@@ -57,13 +58,13 @@ void blitFrameBuffer(const struct FrameBuffer read_buf, struct FrameBuffer write
 	}
 }
 
-void clearDepthBuffer(struct DepthBuffer buffer) {
+void cleardepthbuffer(struct depthbuffer buffer) {
 	for(int i = 0; i < buffer.width * buffer.height; i++){
 		buffer.depth[i] = INFINITY;
 	}
 }
 
-void drawTriangle(struct FrameBuffer framebuffer, const struct triangle tri, const RGB color)
+void drawTriangle(struct framebuffer framebuffer, const struct triangle tri, const rgb color)
 {
 	float area = edgeFunction(tri.vertices[0], tri.vertices[1], tri.vertices[2]); 
  
@@ -89,23 +90,23 @@ void drawTriangle(struct FrameBuffer framebuffer, const struct triangle tri, con
 	}
 }
 
-void drawTriangleDepthTested(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, const struct triangle tri, const RGB color)
+void drawTriangleDepthTested(struct framebuffer framebuffer, struct depthbuffer depthbuffer, const struct triangle tri, const rgb color)
 {
 	float minx = fminf(tri.vertices[2][0], fminf(tri.vertices[0][0], tri.vertices[1][0]));
 	float miny = fminf(tri.vertices[2][1], fminf(tri.vertices[0][1], tri.vertices[1][1]));
 	float maxx = fmaxf(tri.vertices[2][0], fmaxf(tri.vertices[0][0], tri.vertices[1][0]));
 	float maxy = fmaxf(tri.vertices[2][1], fmaxf(tri.vertices[0][1], tri.vertices[1][1]));
 
-	int trimmedVPX =  clamp(minx, 0, framebuffer.width);
-	int trimmedVPY =  clamp(miny, 0, framebuffer.height);
+	int startX =  clamp(minx, 0, framebuffer.width - 1);
+	int startY =  clamp(miny, 0, framebuffer.height - 1);
 
-	int trimmedVPMX =  clamp(round(maxx), 0, framebuffer.width);
-	int trimmedVPMY =  clamp(round(maxy), 0, framebuffer.height);
+	int endX =  clamp(round(maxx), 0, framebuffer.width - 1);
+	int endY =  clamp(round(maxy), 0, framebuffer.height - 1);
 
 	float area = edgeFunction(tri.vertices[0], tri.vertices[1], tri.vertices[2]); 
  
-	for (uint32_t j = trimmedVPY; j < trimmedVPMY; ++j) { 
-		for (uint32_t i = trimmedVPX; i < trimmedVPMX; ++i) { 
+	for (size_t j = startY; j < endY; ++j) { 
+		for (size_t i = startX; i < endX; ++i) { 
 			float p [2]= {i + 0.5f, j + 0.5f}; 
 			float w0 = edgeFunction(tri.vertices[1], tri.vertices[2], p); 
 			float w1 = edgeFunction(tri.vertices[2], tri.vertices[0], p); 
@@ -115,7 +116,7 @@ void drawTriangleDepthTested(struct FrameBuffer framebuffer, struct DepthBuffer 
 				w1 /= area; 
 				w2 /= area; 
 				
-				int invJ = framebuffer.height - j;
+				int invJ = j;
 				float oneOverZ = tri.vertices[0][2] * w0 + tri.vertices[1][2] * w1 + tri.vertices[2][2] * w2;
 
 				float depthOfPixel = oneOverZ;
@@ -134,7 +135,7 @@ void drawTriangleDepthTested(struct FrameBuffer framebuffer, struct DepthBuffer 
 	}
 }
 
-void drawModel(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, const struct model m, const mat4 projMat, const mat4 viewMat, const mat4 modelMat, const vec3 camPos)
+void drawModel(struct framebuffer framebuffer, struct depthbuffer depthbuffer, const struct model m, const mat4 projMat, const mat4 viewMat, const mat4 modelMat, const vec3 camPos)
 {
 	//calc normal matrix, transpose(inverse(viewMatrx)) * transpose(inverse(modelMatrix))
 	mat4 normalMat;
@@ -210,77 +211,9 @@ void drawModel(struct FrameBuffer framebuffer, struct DepthBuffer depthbuffer, c
 		vec3_normalize(normalM, normalM);
 
 		float ndotl = fmax(0.05f, vec3_dot(normalM, lightDir));
-		RGB col = {ndotl,0  * ndotl,0.5 * ndotl};
+		rgb col = {ndotl,0  * ndotl,0.5 * ndotl};
 
 		drawTriangleDepthTested(framebuffer, depthbuffer, projectedTri, col);
 		debug_RenderedTris++;
 	}
 }
-
-int projectTriangle(const struct triangle tri, const RGB color, int framebufferWidth, int framebufferHeight, const mat4 projMat, const mat4 viewMat, const mat4 modelMat, const mat4 normalMat, struct triangle* outTri)
-{
-	//project triangle
-	int offScreenCnt = 0;
-	for(int v = 0; v < 3; v++){
-		vec4 projectedPos = {tri.vertices[v][0],tri.vertices[v][1],tri.vertices[v][2],1};
-		vec4_mul_mat4(projectedPos, modelMat, projectedPos);
-		vec4_mul_mat4(projectedPos, viewMat, projectedPos);
-
-		//position of vertex in camera space
-		vec3 camSpaceN;
-		vec3_neg(projectedPos, camSpaceN);
-		vec3_normalize(camSpaceN, camSpaceN);
-
-		vec4_mul_mat4(projectedPos, projMat, projectedPos);
-		projectedPos[0] /= projectedPos[3];
-		projectedPos[1] /= projectedPos[3];
-		projectedPos[2] /= projectedPos[3];
-
-		//coords now in ndc
-		//dont render triangles that are not in the viewport
-		if(projectedPos[0] < -1 || projectedPos[0] > 1 || projectedPos[1] < -1 || projectedPos[1] > 1 || projectedPos[2] < -1 || projectedPos[2] > 1 ) {
-			offScreenCnt++;
-		}
-		
-		//bring the vertex into raster-space
-		projectedPos[0] += 1; 
-		projectedPos[0] *= framebufferWidth*0.5f; 
-
-		projectedPos[1] += 1; 
-		projectedPos[1] *= framebufferHeight*0.5f; 
-		vec3_cpy(projectedPos, outTri->vertices[v]);  
-
-		//transform normal
-		vec4 normal = {tri.normals[v][0],tri.normals[v][1],tri.normals[v][2],1};
-		vec4 newNormal;
-		vec4_mul_mat4(normal, normalMat, newNormal);
-		vec4_normalize(newNormal, newNormal);
-		vec3_cpy(newNormal, outTri->normals[v]);  
-
-		//backface cull
-		float n = vec3_dot(newNormal, camSpaceN);
-		if(n < 0) {
-			offScreenCnt = 3;
-			continue;
-		}
-	}
-
-	if(offScreenCnt == 3) return 0;
-
-	// vec4 lightDir = {-0.7, 0.5, 1, 1};
-	// vec3_neg(lightDir, lightDir);
-	// vec3_normalize(lightDir, lightDir);
-	
-	// vec4_mul_mat4(lightDir, temp2, lightDir);
-	// vec3_normalize(lightDir, lightDir);
-
-	vec3 normalM = {0,0,0}, diver = {1.0f / 3, 1.0f / 3, 1.0f / 3};
-	vec3_add(normalM, outTri->normals[0], normalM);
-	vec3_add(normalM, outTri->normals[1], normalM);
-	vec3_add(normalM, outTri->normals[2], normalM);
-	vec3_div(normalM, diver, normalM);
-	vec3_normalize(normalM, normalM);
-
-	return 1;
-}
-
