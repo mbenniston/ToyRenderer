@@ -11,7 +11,8 @@
 #include "draw.h"
 #include "model.h"
 
-extern int debug_RenderedTris;
+
+extern int debug_RenderedTris, debug_SkippedTris;
 
 vec3 camPos;
 float camRot;
@@ -73,9 +74,9 @@ void keyboard_cb(struct Window *window, Key key, KeyMod mod, bool isPressed)
 int main()
 {
 	struct model mod, mod2, floor;
-	model_Load("sphere.obj", &mod);
-	model_Load("cube.obj", &mod2);
-	model_Load("floor.obj", &floor);
+	model_Load("./res/sphere.obj", &mod);
+	model_Load("./res/cube.obj", &mod2);
+	model_Load("./res/floor.obj", &floor);
 
 	struct framebuffer framebuffer;
 	framebuffer.width = FB_WIDTH;
@@ -101,9 +102,9 @@ int main()
 	if (!window)
 		return 0;
 
-	camPos[0] = 0;
-	camPos[1] = 0;
-	camPos[2] = 0;
+	camPos.x = 0;
+	camPos.y = 0;
+	camPos.z = 0;
 
 	camRot = 0;
 
@@ -121,43 +122,37 @@ int main()
 		clearframebuffer(framebuffer_LowRes, clearCol);
 		cleardepthbuffer(depthbuffer);
 
-		camPos[0] += -sin(camRot) * 10 * forward * timeTaken;
-		camPos[2] += cos(camRot) * 10 * forward * timeTaken;
+		camPos.x += -sin(camRot) * 10 * forward * timeTaken;
+		camPos.z += cos(camRot) * 10 * forward * timeTaken;
 
-		camPos[0] += cos(camRot) * 10 *  strafe * timeTaken;
-		camPos[2] += sin(camRot) * 10 *  strafe * timeTaken;
+		camPos.x += cos(camRot) * 10 *  strafe * timeTaken;
+		camPos.z += sin(camRot) * 10 *  strafe * timeTaken;
 
 		camRot += 0.5f * rotSpeed * timeTaken;
 
 		mat4 projMat;
 		mat4_setPerspective(projMat, CAM_FOV, FB_ASPECT, CAM_NEAR, CAM_FAR);
 
-		mat4 rotMat;
-		mat4_setIdentity(rotMat);
+		mat4 modelMat;
 		static float t = 0;
 		t += timeTaken * 0.5f * PI;
-		mat4_setRotXYZ(t * 0.75f, t, 0, rotMat);
-
-		mat4 transMat;
-		mat4_setIdentity(transMat);
-		vec3 pos = {0,0, 5};
-		mat4_setTranslation(transMat, pos[0], pos[1], pos[2]);
-
-		mat4 modelMat;
 		mat4_setIdentity(modelMat);
-		mat4_mul(rotMat, transMat, modelMat);
+		// mat4_setScale(modelMat, 0.01f + fabs(sin(t)), 0.01f + fabs(sin(t)), 0.01f + fabs(sin(t)));
+		// mat4_rotate(modelMat, t * 0.75f, t, 0, modelMat);
 
 		mat4 viewMat;
 		mat4_setIdentity(viewMat);
-		mat4_setTranslation(viewMat, -camPos[0], -camPos[1], -camPos[2]);
+		mat4_setTranslation(viewMat, -camPos.x, -camPos.y, -camPos.z);
 		mat4_rotate(viewMat, 0, camRot, 0, viewMat);
 
 		debug_RenderedTris = 0;
+		debug_SkippedTris = 0;
 
-		for(int i = 0; i < 100; i++) {
+		for(int i = 0; i < 1; i++) {
+			// mat4_setTranslation(modelMat, 3 * (i % 10), sin(t + i%10), 5 + 3 * (i / 10));
 			mat4_setTranslation(modelMat, 3 * (i % 10), 0, 5 + 3 * (i / 10));
-			
-			drawModel(framebuffer_LowRes, depthbuffer, mod, projMat, viewMat, modelMat, camPos);
+
+			drawModel(framebuffer_LowRes, depthbuffer, i % 2 == 0 ? mod2 : mod2 , projMat, viewMat, modelMat, camPos);
 		}
 
 		//upscale
@@ -177,10 +172,10 @@ int main()
 		if(fpsTimer > 1.0) { 
 			printf("fps: %f\n", numFrames / fpsTimer);
 			printf("%i triangles rendered\n", debug_RenderedTris);
+			printf("%i triangles not rendered\n", debug_SkippedTris);
 			numFrames = 0;
 			fpsTimer = 0.0;
 		}
-		
 	}
 
 	free(framebuffer.pixels);

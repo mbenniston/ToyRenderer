@@ -27,9 +27,6 @@ void model_Load(const char* filePath, struct model* const m)
         printf("Opened %s for reading\n", filePath);
     }
 
-    // vec3* verticesBuffer = malloc(1024 * 3 * sizeof(float));
-    // size_t currentVertexIndex = 0;
-
     struct array_list verticesBuffer, normalsBuffer, facesBuffer;
     array_list_Init(sizeof(vec3), 100, &verticesBuffer);
     array_list_Init(sizeof(vec3), 100, &normalsBuffer);
@@ -44,16 +41,16 @@ void model_Load(const char* filePath, struct model* const m)
             if(strncmp(line, "v ", 2) == 0) {
                 //handle vertex
                 vec3 vertex;
-                int ret = sscanf(line, "v %f %f %f\n", &vertex[0], &vertex[1], &vertex[2]);    
+                int ret = sscanf(line, "v %f %f %f\n", &vertex.x, &vertex.y, &vertex.z);    
                 assert(ret == 3);
-                array_list_Push(&verticesBuffer, vertex);
+                array_list_Push(&verticesBuffer, &vertex);
 
             } else if(strncmp(line, "vn ", 3) == 0) {
                 //handle normal
                 vec3 normal;
-                int ret = sscanf(line, "vn %f %f %f\n", &normal[0], &normal[1], &normal[2]);    
+                int ret = sscanf(line, "vn %f %f %f\n", &normal.x, &normal.y, &normal.z);    
                 assert(ret == 3);
-                array_list_Push(&normalsBuffer, normal);
+                array_list_Push(&normalsBuffer, &normal);
 
             }else if(strncmp(line, "f ", 2) == 0) {
                 //handle face
@@ -80,13 +77,13 @@ void model_Load(const char* filePath, struct model* const m)
     for(int i = 0; i < facesBuffer.currentItem; i++) {
         struct face f = ((struct face*)facesBuffer.array)[i];
         struct triangle* tri = &m->triangles[m->numTriangles];
-        vec3_cpy(((vec3*)verticesBuffer.array)[f.v0 - 1], (*tri).vertices[0]);
-        vec3_cpy(((vec3*)verticesBuffer.array)[f.v1 - 1], (*tri).vertices[1]);
-        vec3_cpy(((vec3*)verticesBuffer.array)[f.v2 - 1], (*tri).vertices[2]);
+        (*tri).vertices[0] = ((vec3*)verticesBuffer.array)[f.v0 - 1];
+        (*tri).vertices[1] = ((vec3*)verticesBuffer.array)[f.v1 - 1];
+        (*tri).vertices[2] = ((vec3*)verticesBuffer.array)[f.v2 - 1];
 
-        vec3_cpy(((vec3*)normalsBuffer.array)[f.n0 - 1], (*tri).normals[0]);
-        vec3_cpy(((vec3*)normalsBuffer.array)[f.n1 - 1], (*tri).normals[1]);
-        vec3_cpy(((vec3*)normalsBuffer.array)[f.n2 - 1], (*tri).normals[2]);
+        (*tri).normals[0] = ((vec3*)normalsBuffer.array)[f.n0 - 1];
+        (*tri).normals[1] = ((vec3*)normalsBuffer.array)[f.n1 - 1];
+        (*tri).normals[2] = ((vec3*)normalsBuffer.array)[f.n2 - 1];
 
         m->numTriangles++;
     }

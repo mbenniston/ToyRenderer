@@ -1,29 +1,38 @@
 #include "vec.h"
+
 #include <string.h>
 #include <stdio.h>
 
-void vec2_add(const vec2 left, const vec2 right, vec2 out) {
-    out[0] = left[0] + right[0];
-    out[1] = left[1] + right[1];
+vec2 vec2_add(const vec2 left, const vec2 right) {
+    vec2 out;
+    out.x = left.x + right.x;
+    out.y = left.y + right.y;
+    return out;
 }
 
-void vec2_sub(const vec2 left, const vec2 right, vec2 out) {
-    out[0] = left[0] - right[0];
-    out[1] = left[1] - right[1];
+vec2 vec2_sub(const vec2 left, const vec2 right) {
+    vec2 out;
+    out.x = left.x - right.x;
+    out.y = left.y - right.y;
+    return out;
 }
 
-void vec2_mul(const vec2 left, const vec2 right, vec2 out) {
-    out[0] = left[0] * right[0];
-    out[1] = left[1] * right[1];
+vec2 vec2_mul(const vec2 left, const vec2 right) {
+    vec2 out;
+    out.x = left.x * right.x;
+    out.y = left.y * right.y;
+    return out;
 }
 
-void vec2_div(const vec2 left, const vec2 right, vec2 out) {
-    out[0] = left[0] / right[0];
-    out[1] = left[1] / right[1];
+vec2 vec2_div(const vec2 left, const vec2 right) {
+    vec2 out;
+    out.x = left.x * right.x;
+    out.y = left.y * right.y;
+    return out;
 }
 
 float vec2_dot(const vec2 left, const vec2 right) {
-    return left[0] * right[0] + left[1] * left[1];
+    return left.x * right.x + left.y * left.y;
 }
 
 float vec2_lengthSquared(const vec2 vec){
@@ -36,36 +45,57 @@ float vec2_length(const vec2 vec) {
 
 ////////////////////////////////////////////////////////
 
-void vec3_cpy(const vec3 vec, vec3 out) {
-    memcpy(out, vec, 3 * sizeof(float));
+vec3 vec3_add(const vec3 left, const vec3 right) {
+    vec3 out;
+    out.x = left.x + right.x;
+    out.y = left.y + right.y;
+    out.z = left.z + right.z;     
+    return out;
 }
 
-void vec3_add(const vec3 left, const vec3 right, vec3 out) {
-    out[0] = left[0] + right[0];
-    out[1] = left[1] + right[1];
-    out[2] = left[2] + right[2];
+vec3 vec3_sub(const vec3 left, const vec3 right) {
+    vec3 out;
+    out.x = left.x - right.x;
+    out.y = left.y - right.y;
+    out.z = left.z - right.z;     
+    return out;
 }
 
-void vec3_sub(const vec3 left, const vec3 right, vec3 out) {
-    out[0] = left[0] - right[0];
-    out[1] = left[1] - right[1];
-    out[2] = left[2] - right[2];
+vec3 vec3_mul(const vec3 left, const vec3 right) {
+    vec3 out;
+    out.x = left.x * right.x;
+    out.y = left.y * right.y;
+    out.z = left.z * right.z;     
+    return out;
+
 }
 
-void vec3_mul(const vec3 left, const vec3 right, vec3 out) {
-    out[0] = left[0] * right[0];
-    out[1] = left[1] * right[1];
-    out[2] = left[2] * right[2];
+vec3 vec3_mul_f(const vec3 left, const float right) {
+    vec3 out;
+    out.x = left.x + right;
+    out.y = left.y + right;
+    out.z = left.z + right;     
+    return out;
 }
 
-void vec3_div(const vec3 left, const vec3 right, vec3 out) {
-    out[0] = left[0] / right[0];
-    out[1] = left[1] / right[1];
-    out[2] = left[2] / right[2];
+vec3 vec3_div(const vec3 left, const vec3 right) {
+    vec3 out;
+    out.x = left.x / right.x;
+    out.y = left.y / right.y;
+    out.z = left.z / right.z;     
+    return out;
+}
+
+vec3 vec3_div_f(const vec3 left, const float right) {
+    vec3 out;
+    out.x = left.x / right;
+    out.y = left.y / right;
+    out.z = left.z / right;     
+    return out;
 }
 
 float vec3_dot(const vec3 left, const vec3 right) {
-    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+    return left.x * right.x + left.y * right.y + left.z * right.z;
 }
 
 float vec3_lengthSquared(const vec3 vec){
@@ -76,73 +106,90 @@ float vec3_length(const vec3 vec) {
     return sqrtf(vec3_lengthSquared(vec));
 } 
 
-void vec3_neg(const vec3 vec, vec3 out) {
-    out[0] = -vec[0];
-    out[1] = -vec[1];
-    out[2] = -vec[2];
+vec3 vec3_neg(const vec3 vec) {
+    vec3 out;
+    out.x = -vec.x;
+    out.y = -vec.y;
+    out.z = -vec.z;
+    return out;    
 }
-void vec3_normalize(const vec3 vec, vec3 out) {
+
+vec3 vec3_normalize(const vec3 vec) {
     float length = vec3_length(vec);
-    out[0] = vec[0] / length;
-    out[1] = vec[1] / length;
-    out[2] = vec[2] / length;
+    return vec3_div_f(vec, length);
 }
 
 void vec3_print(const vec3 vec) {
-    printf("%f, %f, %f\n\n", vec[0], vec[1], vec[2]);
+    printf("%f, %f, %f\n\n", vec.x, vec.y, vec.z);
 }
 
+vec3 vec3_cross(const vec3 left, const vec3 right) {
+    vec3 out;
+    out.x = left.y * right.z - left.z* right.y;
+    out.y = left.z * right.x - left.x * right.z;
+    out.z = left.x * right.y - left.y * right.x;
+    return out;
+}
 
 ////////////////////////////////////////////////////////
 
-
-void vec4_cpy(const vec4 vec, vec4 out) {
-    memcpy(out, vec, 4 * sizeof(float));
+vec4 vec4_add(const vec4 left, const vec4 right) {
+    vec4 out;
+    out.x = left.x + right.x;
+    out.y = left.y + right.y;
+    out.z = left.z + right.z;     
+    out.w = left.w + right.w;     
+    return out;
 }
 
-void vec4_add(const vec4 left, const vec4 right, vec4 out) {
-    out[0] = left[0] + right[0];
-    out[1] = left[1] + right[1];
-    out[2] = left[2] + right[2];
-    out[3] = left[3] + right[3];
+vec4 vec4_sub(const vec4 left, const vec4 right) {
+    vec4 out;
+    out.x = left.x - right.x;
+    out.y = left.y - right.y;
+    out.z = left.z - right.z;     
+    out.w = left.w - right.w;     
+    return out;
 }
 
-void vec4_sub(const vec4 left, const vec4 right, vec4 out) {
-    out[0] = left[0] - right[0];
-    out[1] = left[1] - right[1];
-    out[2] = left[2] - right[2];
-    out[3] = left[3] - right[3];
+vec4 vec4_mul(const vec4 left, const vec4 right) {
+    vec4 out;
+    out.x = left.x * right.x;
+    out.y = left.y * right.y;
+    out.z = left.z * right.z;     
+    out.w = left.w * right.w;     
+    return out;
+
 }
 
-void vec4_mul(const vec4 left, const vec4 right, vec4 out) {
-    out[0] = left[0] * right[0];
-    out[1] = left[1] * right[1];
-    out[2] = left[2] * right[2];
-    out[2] = left[2] * right[2];
+vec4 vec4_mul_f(const vec4 left, const float right) {
+    vec4 out;
+    out.x = left.x * right;
+    out.y = left.y * right;
+    out.z = left.z * right;     
+    out.w = left.w * right;     
+    return out;
 }
 
-void vec4_mul_mat4(const vec4 left, const mat4 right, vec4 out) {
-    vec4 temp;
-    memset(temp, 0, 4 * sizeof(float));
-
-    for(int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
-            temp[i] += left[j]* right[i][j];
-        }
-    }
-
-    vec4_cpy(temp, out);
+vec4 vec4_div(const vec4 left, const vec4 right) {
+    vec4 out;
+    out.x = left.x / right.x;
+    out.y = left.y / right.y;
+    out.z = left.z / right.z;     
+    out.w = left.w / right.w;     
+    return out;
 }
 
-void vec4_div(const vec4 left, const vec4 right, vec4 out) {
-    out[0] = left[0] / right[0];
-    out[1] = left[1] / right[1];
-    out[2] = left[2] / right[2];
-    out[3] = left[3] / right[3];
+vec4 vec4_div_f(const vec4 left, const float right) {
+    vec4 out;
+    out.x = left.x / right;
+    out.y = left.y / right;
+    out.z = left.z / right;     
+    out.w = left.w / right;     
+    return out;
 }
 
 float vec4_dot(const vec4 left, const vec4 right) {
-    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2] + left[3] * right[3];
+    return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
 }
 
 float vec4_lengthSquared(const vec4 vec){
@@ -152,6 +199,38 @@ float vec4_lengthSquared(const vec4 vec){
 float vec4_length(const vec4 vec) {
     return sqrtf(vec4_lengthSquared(vec));
 } 
+
+vec4 vec4_neg(const vec4 vec) {
+    vec4 out;
+    out.x = -vec.x;
+    out.y = -vec.y;
+    out.z = -vec.z;
+    out.w = -vec.w;
+    return out;    
+}
+
+vec4 vec4_normalize(const vec4 vec) {
+    float length = vec4_length(vec);
+    return vec4_div_f(vec, length);
+}
+
+void vec4_print(const vec4 vec) {
+    printf("%f, %f, %f\n\n", vec.x, vec.y, vec.z);
+}
+
+vec4 vec4_mul_mat4(const vec4 left, const mat4 right) {
+    vec4 temp = {0,0,0,0};
+
+    for(int i = 0; i < 4; i++) {
+        for(int j = 0; j < 4; j++) {
+            (&temp.x)[i] += (&left.x)[j]* right[i][j];
+        }
+    }
+
+    return temp;
+}
+
+////////////////////////////////////////////////////////
 
 void mat4_setPerspective(mat4 mat, float fov, float aspect, float nearPlane, float farPlane) {
     float fovRad = fov * PI / 180.0f;
@@ -164,21 +243,6 @@ void mat4_setPerspective(mat4 mat, float fov, float aspect, float nearPlane, flo
     mat[2][3] = (-farPlane * nearPlane) / (farPlane - nearPlane);
     mat[3][2] = 1.0f;
 }
-
-void vec4_print(const vec4 vec) {
-    printf("%f, %f, %f, %f\n\n", vec[0], vec[1], vec[2], vec[3]);
-}
-
-void vec4_normalize(const vec4 vec, vec4 out)
-{
-    float l = vec4_length(vec);
-    out[0] = vec[0] / l;
-    out[1] = vec[1] / l;
-    out[2] = vec[2] / l;
-    out[3] = vec[3] / l;
-}
-
-////////////////////////////////////////////////////////
 
 void mat4_setIdentity(mat4 mat) {
     memset(mat, 0, 16 * sizeof(float));
